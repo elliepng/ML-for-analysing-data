@@ -7,12 +7,11 @@ import joblib
 import numpy as np
 import pandas as pd
 
-from .constants import AMOUNT_REFERENCE, MODEL_LABELS, RISK_HIGH, RISK_MEDIUM
+from .constants import AMOUNT_REFERENCE, ARTIFACTS_DIR, MODEL_LABELS, RISK_HIGH, RISK_MEDIUM
 from .data import feature_matrix, generate_demo_transactions, normalize_transactions, read_scored_artifact
 from .styling import TOKENS
 
 
-ARTIFACTS_DIR = Path(__file__).resolve().parents[2] / "artifacts"
 FULL_SCORED_ARTIFACT = "full_scored_transactions.parquet"
 LABEL_TO_KEY = {label: key for key, label in MODEL_LABELS.items()}
 

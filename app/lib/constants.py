@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from pathlib import Path
+
+ARTIFACTS_DIR = Path(__file__).resolve().parents[2] / "artifacts"
+
 RISK_HIGH = 0.80
 RISK_MEDIUM = 0.50
 AMOUNT_REFERENCE = 10_000_000

@@ -6,10 +6,7 @@ import json
 import numpy as np
 import pandas as pd
 
-from .constants import MODEL_LABELS
-
-
-ARTIFACTS_DIR = Path(__file__).resolve().parents[2] / "artifacts"
+from .constants import ARTIFACTS_DIR, MODEL_LABELS
 MODEL_METRIC_NAMES = {
     "xgb": "XGBoost supervised",
     "iforest": "Isolation Forest",
