@@ -1,0 +1,13 @@
+.venv/
+.pycache/
+.pytest_cache/
+.ruff_cache/
+.code-review-graph/
+__pycache__/
+*.pyc
+.DS_Store
+data/raw/*.csv
+data/processed/*.parquet
+artifacts/*.pkl
+artifacts/*.csv
+artifacts/*.json
