@@ -55,7 +55,13 @@ st.info(
     "App hỗ trợ upload và chấm điểm toàn bộ file CSV tới 600 MB. File lớn sẽ cần thêm RAM và thời gian xử lý trong lần score đầu tiên."
 )
 
-entry_col, guide_col = st.columns([1.15, 0.85])
+local_ready = LOCAL_PAYSIM_PATH.exists()
+
+if local_ready:
+    entry_col, guide_col = st.columns([1.15, 0.85])
+else:
+    entry_col = st.container()
+
 with entry_col:
     with surface():
         section_header("Upload transaction file", "Nạp dữ liệu để chấm điểm, xem preview và xuất bằng chứng")
@@ -65,31 +71,30 @@ with entry_col:
             st.caption("Cột bắt buộc: type, amount, oldbalanceOrg, newbalanceOrig, oldbalanceDest, newbalanceDest.")
         with right:
             use_demo = st.button("Dùng dữ liệu PaySim demo")
-with guide_col:
-    with surface():
-        section_header("PaySim local full", "Dùng file thực nghiệm có sẵn mà không cần upload qua browser.")
-        st.markdown(
-            "- Tạo cache scored đầy đủ từ `data/raw/paysim dataset.csv`.\n"
-            "- Cache được lưu trong `artifacts/full_scored_transactions.parquet`.\n"
-            "- Các trang dashboard sẽ tự dùng cache này khi không có upload session."
-        )
-        local_ready = LOCAL_PAYSIM_PATH.exists()
-        artifact_ready = has_full_scored_artifact()
-        st.caption(
-            "Trạng thái: "
-            + ("đã có PaySim local" if local_ready else "chưa thấy file PaySim local")
-            + " · "
-            + ("đã có cache full scored" if artifact_ready else "chưa có cache full scored")
-        )
-        if st.button("Tạo/dùng PaySim full cache", disabled=not local_ready):
-            try:
-                with st.spinner("Đang score toàn bộ PaySim và lưu cache Parquet..."):
-                    build_full_scored_artifact(LOCAL_PAYSIM_PATH, model_key=model_key)
-                    clear_uploaded_dataset()
-                st.success("Đã tạo cache PaySim full. Dashboard sẽ dùng full scored artifact.")
-                st.rerun()
-            except Exception as exc:
-                st.error(f"Không tạo được PaySim full cache: {exc}")
+
+if local_ready:
+    with guide_col:
+        with surface():
+            section_header("PaySim local full", "Dùng file thực nghiệm có sẵn mà không cần upload qua browser.")
+            st.markdown(
+                "- Tạo cache scored đầy đủ từ `data/raw/paysim dataset.csv`.\n"
+                "- Cache được lưu trong `artifacts/full_scored_transactions.parquet`.\n"
+                "- Các trang dashboard sẽ tự dùng cache này khi không có upload session."
+            )
+            artifact_ready = has_full_scored_artifact()
+            st.caption(
+                "Trạng thái: đã có PaySim local · "
+                + ("đã có cache full scored" if artifact_ready else "chưa có cache full scored")
+            )
+            if st.button("Tạo/dùng PaySim full cache"):
+                try:
+                    with st.spinner("Đang score toàn bộ PaySim và lưu cache Parquet..."):
+                        build_full_scored_artifact(LOCAL_PAYSIM_PATH, model_key=model_key)
+                        clear_uploaded_dataset()
+                    st.success("Đã tạo cache PaySim full. Dashboard sẽ dùng full scored artifact.")
+                    st.rerun()
+                except Exception as exc:
+                    st.error(f"Không tạo được PaySim full cache: {exc}")
 
 if use_demo:
     set_uploaded_dataset(
