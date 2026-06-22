@@ -11,3 +11,5 @@ data/processed/*.parquet
 artifacts/*.pkl
 artifacts/*.csv
 artifacts/*.json
+.installed
+dist/
