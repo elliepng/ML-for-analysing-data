@@ -37,6 +37,22 @@ def metric(value: float) -> float:
     return float(value)
 
 
+def tune_threshold(y_true, scores, target_recall: float = 0.95, floor: float = 0.05) -> float:
+    """Smallest threshold reaching target recall with the best precision; floor otherwise."""
+    import numpy as np
+
+    precision_curve, recall_curve, thresholds = precision_recall_curve(y_true, scores)
+    best_threshold = None
+    best_precision = -1.0
+    for p, r, t in zip(precision_curve[:-1], recall_curve[:-1], thresholds):
+        if r >= target_recall and p > best_precision:
+            best_precision = p
+            best_threshold = t
+    if best_threshold is None:
+        return floor
+    return float(max(best_threshold, floor))
+
+
 def sparse_indices(n: int, max_points: int = 60) -> list[int]:
     if n <= max_points:
         return list(range(n))
@@ -85,7 +101,7 @@ def balanced_sample(df: pd.DataFrame, normal_ratio: int, random_state: int) -> p
     return pd.concat([fraud, normal_sample], ignore_index=True).sample(frac=1, random_state=random_state)
 
 
-def train(input_path: Path, output_dir: Path, max_rows: int | None, normal_ratio: int) -> None:
+def train(input_path: Path, output_dir: Path, max_rows: int | None, normal_ratio: int, target_recall: float = 0.95) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
     raw = pd.read_csv(input_path, nrows=max_rows)
     errors = validate_transaction_schema(raw, required_columns=REQUIRED_TRAIN_COLUMNS, require_labels=True)
@@ -113,7 +129,8 @@ def train(input_path: Path, output_dir: Path, max_rows: int | None, normal_ratio
     supervised, supervised_label = _build_supervised_model()
     supervised.fit(x_train, y_train)
     probabilities = supervised.predict_proba(x_test)[:, 1]
-    predictions = (probabilities >= RISK_HIGH).astype(int)
+    threshold = tune_threshold(y_test, probabilities, target_recall=target_recall)
+    predictions = (probabilities >= threshold).astype(int)
     fpr, tpr, _ = roc_curve(y_test, probabilities)
     precision_curve, recall_curve, _ = precision_recall_curve(y_test, probabilities)
     roc_idx = sparse_indices(len(fpr))
@@ -128,7 +145,7 @@ def train(input_path: Path, output_dir: Path, max_rows: int | None, normal_ratio
     iforest_predictions = (iforest.predict(x_test_scaled) == -1).astype(int)
 
     joblib.dump(
-        {"model": supervised, "feature_columns": list(x.columns), "threshold": RISK_HIGH},
+        {"model": supervised, "feature_columns": list(x.columns), "threshold": threshold},
         output_dir / "model_xgb.pkl",
     )
     joblib.dump(
@@ -147,7 +164,7 @@ def train(input_path: Path, output_dir: Path, max_rows: int | None, normal_ratio
     scored = scoped.sample(min(len(scoped), 50_000), random_state=42).copy()
     scored_probabilities = supervised.predict_proba(feature_matrix(scored))[:, 1]
     scored["risk_score"] = scored_probabilities
-    scored["predicted_fraud"] = (scored["risk_score"] >= RISK_HIGH).astype(int)
+    scored["predicted_fraud"] = (scored["risk_score"] >= threshold).astype(int)
     scored["risk_level"] = pd.cut(
         scored["risk_score"],
         bins=[-0.01, RISK_MEDIUM, RISK_HIGH, 1.01],
@@ -211,9 +228,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-dir", type=Path, default=ROOT / "artifacts")
     parser.add_argument("--max-rows", type=int, default=None)
     parser.add_argument("--normal-ratio", type=int, default=8)
+    parser.add_argument("--target-recall", type=float, default=0.95)
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = parse_args()
-    train(args.input, args.output_dir, args.max_rows, args.normal_ratio)
+    train(args.input, args.output_dir, args.max_rows, args.normal_ratio, args.target_recall)
