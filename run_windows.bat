@@ -1,4 +1,5 @@
 @echo off
+
 REM ============================================================
 REM  Fraud Detection Dashboard - Windows x64 launcher
 REM  Lan dau: tu dong cai dat (2-5 phut). Lan sau: mo ngay.
@@ -9,7 +10,8 @@ cd /d "%~dp0"
 chcp 65001 >nul
 
 REM --- Chon Python launcher ---
-where py >nul 2>nul && (set "PY=py -3.12") || (set "PY=python")
+where py >nul 2>nul && (set "PY=py") || (set "PY=python")
+
 
 REM --- Kiem tra Python ton tai ---
 %PY% --version >nul 2>nul
@@ -34,7 +36,7 @@ call ".venv\Scripts\activate.bat"
 
 REM --- Cai thu vien chi lan dau (hoac khi requirements.txt thay doi) ---
 if not exist ".installed" (
-  echo [cai dat] Cai thu vien lan dau (2-5 phut, can Internet)...
+  echo [cai dat] Cai thu vien lan dau [2-5 phut, can Internet]...
   python -m pip install --upgrade pip --quiet
   pip install -r requirements.txt
   if errorlevel 1 (
