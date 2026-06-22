@@ -40,7 +40,7 @@ filtered = df[
     df["type"].isin(selected_types)
     & (df["risk_score"] >= min_risk)
     & (df["amount"] <= amount_max)
-].copy()
+]
 
 review_count = len(filtered)
 review_exposure = filtered["amount"].sum()

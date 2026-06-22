@@ -33,7 +33,7 @@ page_intro(
 
 active = get_active_dataset(model_key=model_key)
 data_source_banner(active.label, is_demo=active.is_demo, is_uploaded=active.is_uploaded)
-filtered = active.scored[active.scored["risk_score"] >= min_risk].copy()
+filtered = active.scored[active.scored["risk_score"] >= min_risk]
 
 left, right = st.columns([1, 1])
 with left:

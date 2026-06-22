@@ -49,7 +49,7 @@ page_intro(
 active = get_active_dataset(model_key=model_key)
 df = active.scored
 data_source_banner(active.label, is_demo=active.is_demo, is_uploaded=active.is_uploaded)
-filtered = df[df["risk_score"] >= min_risk].copy()
+filtered = df[df["risk_score"] >= min_risk]
 metrics = cached_metrics(model_key)
 confusion = cached_confusion_matrix(model_key)
 

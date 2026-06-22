@@ -126,7 +126,7 @@ if active.is_uploaded and st.button("Clear uploaded session data"):
     st.rerun()
 
 scored = active.scored
-filtered = scored[scored["risk_score"] >= min_risk].copy()
+filtered = scored[scored["risk_score"] >= min_risk]
 flagged = int(scored["predicted_fraud"].sum())
 exposure = scored.loc[scored["predicted_fraud"] == 1, "amount"].sum()
 
@@ -172,7 +172,7 @@ with download_cols[0]:
         )
 with download_cols[1]:
     if st.button("Tạo audit PDF"):
-        report_scope = scored[scored["risk_score"] >= min_risk].copy()
+        report_scope = scored[scored["risk_score"] >= min_risk]
         report_rows = report_scope.sort_values("risk_score", ascending=False).head(15)
         pdf_bytes = build_audit_report(
             report_scope,

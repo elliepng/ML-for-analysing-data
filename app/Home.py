@@ -45,7 +45,7 @@ with st.sidebar:
 
 active = get_active_dataset(model_key=model_key)
 df = active.scored
-filtered = df[df["risk_score"] >= min_risk].copy()
+filtered = df[df["risk_score"] >= min_risk]
 
 total_transactions = len(filtered)
 flagged = int(filtered["predicted_fraud"].sum())
