@@ -127,3 +127,28 @@ def test_full_scored_artifact_builds_and_loads_from_csv(tmp_path: Path) -> None:
     assert output_path.exists()
     assert len(loaded) == 25
     assert {"risk_score", "predicted_fraud", "risk_level"}.issubset(loaded.columns)
+
+
+def test_full_artifact_preserves_built_model_identity(tmp_path: Path) -> None:
+    raw = generate_demo_transactions(rows=30, seed=31)
+    input_path = tmp_path / "transactions.csv"
+    raw.to_csv(input_path, index=False)
+
+    build_full_scored_artifact(input_path, model_key="heuristic", artifacts_dir=tmp_path, chunksize=10)
+
+    # Tamper saved scores to distinguish cached return vs re-score.
+    import pandas as pd
+
+    artifact_path = tmp_path / "full_scored_transactions.parquet"
+    tampered = pd.read_parquet(artifact_path)
+    tampered["risk_score"] = 0.123
+    tampered.to_parquet(artifact_path, index=False)
+
+    # Matching model returns saved scores with the artifact's true label.
+    same = load_scored_transactions(model_key="heuristic", artifacts_dir=tmp_path)
+    assert (same["risk_score"] == 0.123).all()
+    assert set(same["model_used"]) == {"Fallback risk rules"}
+
+    # Different model re-scores, so at least one score differs from 0.123.
+    other = load_scored_transactions(model_key="xgb", artifacts_dir=tmp_path)
+    assert (other["risk_score"] != 0.123).any()

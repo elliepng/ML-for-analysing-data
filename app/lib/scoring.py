@@ -14,6 +14,7 @@ from .styling import TOKENS
 
 ARTIFACTS_DIR = Path(__file__).resolve().parents[2] / "artifacts"
 FULL_SCORED_ARTIFACT = "full_scored_transactions.parquet"
+LABEL_TO_KEY = {label: key for key, label in MODEL_LABELS.items()}
 
 
 def classify_risk(score: float) -> str:
@@ -176,11 +177,17 @@ def load_scored_transactions(model_key: str = "xgb", artifacts_dir: Path = ARTIF
     if artifact is None:
         artifact = read_scored_artifact(artifacts_dir / "scored_transactions.csv")
     if artifact is not None and {"risk_score", "predicted_fraud"}.issubset(artifact.columns):
-        if model_key != "xgb":
+        artifact_key = None
+        if "model_used" in artifact.columns and len(artifact):
+            artifact_key = LABEL_TO_KEY.get(str(artifact["model_used"].iloc[0]))
+        # Legacy scored_transactions.csv has no model identity; it is the supervised output.
+        effective_key = artifact_key or "xgb"
+        if model_key != effective_key:
             return score_transactions(artifact, model_key=model_key, artifacts_dir=artifacts_dir)
-        artifact["risk_level"] = artifact["risk_score"].map(classify_risk)
-        artifact["model_used"] = MODEL_LABELS.get(model_key, model_key)
-        return artifact.sort_values("risk_score", ascending=False).reset_index(drop=True)
+        result = artifact.copy()
+        result["risk_level"] = result["risk_score"].map(classify_risk)
+        result["model_used"] = MODEL_LABELS.get(effective_key, effective_key)
+        return result.sort_values("risk_score", ascending=False).reset_index(drop=True)
     return score_transactions(generate_demo_transactions(), model_key=model_key, artifacts_dir=artifacts_dir)
 
 
