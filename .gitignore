@@ -13,4 +13,6 @@ artifacts/*.csv
 artifacts/*.json
 .installed
 dist/
+artifacts/*.parquet
 data/raw/*.zip
+
