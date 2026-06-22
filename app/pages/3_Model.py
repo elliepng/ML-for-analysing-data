@@ -27,6 +27,21 @@ configure_page("Model Analysis")
 inject_global_css()
 
 
+@st.cache_data(show_spinner=False)
+def cached_metrics() -> pd.DataFrame:
+    return load_model_metrics()
+
+
+@st.cache_data(show_spinner=False)
+def cached_confusion_matrix() -> np.ndarray:
+    return load_confusion_matrix()
+
+
+@st.cache_data(show_spinner=False)
+def cached_real_metrics_status() -> bool:
+    return has_real_metrics()
+
+
 with st.sidebar:
     sidebar_brand()
     st.caption("Model evidence is read from artifacts/model_metrics.json.")
@@ -38,9 +53,9 @@ page_intro(
     eyebrow="Model evidence",
 )
 
-metrics = load_model_metrics()
+metrics = cached_metrics()
 
-if not has_real_metrics():
+if not cached_real_metrics_status():
     st.warning("Chưa có metrics thật. Hãy chạy train_models.py để hiện đầy đủ metric và curve từ PaySim.")
 
 left, right = st.columns(2)
@@ -62,7 +77,7 @@ with left:
 with right:
     with surface():
         section_header("Confusion matrix", "XGBoost predictions at the configured risk threshold")
-        st.plotly_chart(confusion_matrix_figure(load_confusion_matrix()), use_container_width=True)
+        st.plotly_chart(confusion_matrix_figure(cached_confusion_matrix()), use_container_width=True)
 
 st.write("")
 left_curve, right_curve = st.columns(2)

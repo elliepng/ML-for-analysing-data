@@ -23,6 +23,16 @@ configure_page("Generate Audit Report")
 inject_global_css()
 
 
+@st.cache_data(show_spinner=False)
+def cached_metrics(selected_model: str) -> pd.DataFrame:
+    return load_model_metrics(model_key=selected_model)
+
+
+@st.cache_data(show_spinner=False)
+def cached_confusion_matrix(selected_model: str) -> np.ndarray:
+    return load_confusion_matrix(model_key=selected_model)
+
+
 with st.sidebar:
     sidebar_brand()
     model_key = st.selectbox("Model", ["xgb", "iforest", "heuristic"], format_func=str.upper)
@@ -40,9 +50,8 @@ active = get_active_dataset(model_key=model_key)
 df = active.scored
 data_source_banner(active.label, is_demo=active.is_demo, is_uploaded=active.is_uploaded)
 filtered = df[df["risk_score"] >= min_risk]
-
-metrics = load_model_metrics(model_key=model_key)
-confusion = load_confusion_matrix(model_key=model_key)
+metrics = cached_metrics(model_key)
+confusion = cached_confusion_matrix(model_key)
 
 if not has_real_metrics():
     st.warning("Hãy train trên PaySim trước khi dùng PDF này như bằng chứng cuối cùng.")
