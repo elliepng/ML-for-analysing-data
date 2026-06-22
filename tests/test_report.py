@@ -75,3 +75,17 @@ def test_model_report_filters_metrics_and_confusion_by_model(tmp_path: Path) -> 
 
     assert metrics["model"].tolist() == ["Isolation Forest"]
     assert confusion.tolist() == [[7, 3], [5, 5]]
+
+
+def test_xgb_key_resolves_supervised_row_even_when_random_forest(tmp_path: Path) -> None:
+    payload = {
+        "models": [
+            {"model": "Random Forest supervised", "precision": 0.7, "recall": 0.9, "f1": 0.79, "auc_pr": 0.8, "roc_auc": 0.85},
+            {"model": "Isolation Forest", "precision": 0.4, "recall": 0.3, "f1": 0.34, "auc_pr": 0.2, "roc_auc": 0.6},
+        ]
+    }
+    (tmp_path / "model_metrics.json").write_text(json.dumps(payload), encoding="utf-8")
+
+    metrics = load_model_metrics(tmp_path, model_key="xgb")
+    assert len(metrics) == 1
+    assert metrics.iloc[0]["model"] == "Random Forest supervised"

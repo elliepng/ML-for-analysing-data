@@ -98,7 +98,7 @@ with kpi_cols[3]:
 metrics = load_model_metrics()
 xgb_recall = xgb_precision = xgb_auc_pr = xgb_f1 = xgb_roc_auc = 0.0
 if has_real_metrics() and "recall" in metrics.columns:
-    xgb_rows = metrics[metrics["model"].astype(str).str.contains("XGBoost", case=False, na=False)]
+    xgb_rows = metrics.iloc[0:1]
     if not xgb_rows.empty:
         xgb_recall = float(xgb_rows.iloc[0]["recall"]) * 100
         xgb_precision = float(xgb_rows.iloc[0].get("precision", 0)) * 100
@@ -110,6 +110,7 @@ model_rows: list[tuple[str, float, float]] = []
 if has_real_metrics() and "recall" in metrics.columns:
     short_name = {
         "XGBoost supervised": "XGBoost",
+        "Random Forest supervised": "Random Forest",
         "Isolation Forest": "Isolation Forest",
         "Bank rule isFlaggedFraud": "Bank rule (cũ)",
     }

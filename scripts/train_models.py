@@ -51,23 +51,29 @@ def _build_supervised_model():
     try:
         from xgboost import XGBClassifier
 
-        return XGBClassifier(
-            n_estimators=180,
-            max_depth=4,
-            learning_rate=0.08,
-            subsample=0.9,
-            colsample_bytree=0.9,
-            eval_metric="logloss",
-            n_jobs=2,
-            random_state=42,
+        return (
+            XGBClassifier(
+                n_estimators=180,
+                max_depth=4,
+                learning_rate=0.08,
+                subsample=0.9,
+                colsample_bytree=0.9,
+                eval_metric="logloss",
+                n_jobs=2,
+                random_state=42,
+            ),
+            "XGBoost supervised",
         )
     except Exception:
-        return RandomForestClassifier(
-            n_estimators=180,
-            max_depth=10,
-            class_weight="balanced",
-            n_jobs=2,
-            random_state=42,
+        return (
+            RandomForestClassifier(
+                n_estimators=180,
+                max_depth=10,
+                class_weight="balanced",
+                n_jobs=2,
+                random_state=42,
+            ),
+            "Random Forest supervised",
         )
 
 
@@ -104,7 +110,7 @@ def train(input_path: Path, output_dir: Path, max_rows: int | None, normal_ratio
         random_state=42,
     )
 
-    supervised = _build_supervised_model()
+    supervised, supervised_label = _build_supervised_model()
     supervised.fit(x_train, y_train)
     probabilities = supervised.predict_proba(x_test)[:, 1]
     predictions = (probabilities >= RISK_HIGH).astype(int)
@@ -157,7 +163,7 @@ def train(input_path: Path, output_dir: Path, max_rows: int | None, normal_ratio
     metrics = {
         "models": [
             {
-                "model": "XGBoost supervised",
+                "model": supervised_label,
                 "precision": metric(precision_score(y_test, predictions, zero_division=0)),
                 "recall": metric(recall_score(y_test, predictions, zero_division=0)),
                 "f1": metric(f1_score(y_test, predictions, zero_division=0)),

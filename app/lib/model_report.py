@@ -61,7 +61,12 @@ def load_model_metrics(artifacts_dir: Path = ARTIFACTS_DIR, model_key: str | Non
     metric_name = MODEL_METRIC_NAMES.get(model_key)
     if metric_name is None:
         return metrics.iloc[0:0]
-    return metrics[metrics["model"].astype(str) == metric_name].reset_index(drop=True)
+    filtered = metrics[metrics["model"].astype(str) == metric_name].reset_index(drop=True)
+    if filtered.empty and model_key == "xgb" and not metrics.empty:
+        # Supervised model is always the first row written by train_models.py,
+        # even when XGBoost falls back to RandomForest.
+        return metrics.iloc[0:1].reset_index(drop=True)
+    return filtered
 
 
 def load_confusion_matrix(artifacts_dir: Path = ARTIFACTS_DIR, model_key: str = "xgb") -> np.ndarray:
