@@ -9,10 +9,10 @@ APP_DIR = Path(__file__).resolve().parents[1]
 if str(APP_DIR) not in sys.path:
     sys.path.insert(0, str(APP_DIR))
 
-from lib.charts import amount_vs_risk, fraud_by_type, risk_distribution
-from lib.state import get_active_dataset
-from lib.styling import configure_page, inject_global_css, page_intro
-from lib.ui import data_source_banner, section_header, sidebar_brand, sidebar_cta, surface
+from lib.charts import amount_vs_risk, fraud_by_type, risk_distribution  # noqa: E402
+from lib.state import get_active_dataset  # noqa: E402
+from lib.styling import configure_page, inject_global_css, page_intro  # noqa: E402
+from lib.ui import data_source_banner, section_header, sidebar_brand, sidebar_cta, surface  # noqa: E402
 
 
 configure_page("Analytics")

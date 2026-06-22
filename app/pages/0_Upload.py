@@ -10,14 +10,14 @@ APP_DIR = Path(__file__).resolve().parents[1]
 if str(APP_DIR) not in sys.path:
     sys.path.insert(0, str(APP_DIR))
 
-from lib.constants import REPORT_ANALYST, RISK_HIGH
-from lib.data import generate_demo_transactions
-from lib.model_report import load_confusion_matrix, load_model_metrics, selected_model_label
-from lib.report_builder import build_audit_report
-from lib.scoring import build_full_scored_artifact, has_full_scored_artifact
-from lib.state import clear_uploaded_dataset, get_active_dataset, set_uploaded_dataset, uploaded_source_key
-from lib.styling import configure_page, inject_global_css, page_intro
-from lib.ui import (
+from lib.constants import REPORT_ANALYST, RISK_HIGH  # noqa: E402
+from lib.data import generate_demo_transactions  # noqa: E402
+from lib.model_report import load_confusion_matrix, load_model_metrics, selected_model_label  # noqa: E402
+from lib.report_builder import build_audit_report  # noqa: E402
+from lib.scoring import build_full_scored_artifact, has_full_scored_artifact  # noqa: E402
+from lib.state import clear_uploaded_dataset, get_active_dataset, set_uploaded_dataset, uploaded_source_key  # noqa: E402
+from lib.styling import configure_page, inject_global_css, page_intro  # noqa: E402
+from lib.ui import (  # noqa: E402
     data_source_banner,
     human_money,
     kpi_card,
@@ -26,7 +26,7 @@ from lib.ui import (
     sidebar_cta,
     surface,
 )
-from lib.upload import read_uploaded_csv, scored_to_csv_bytes, validate_upload_columns
+from lib.upload import read_uploaded_csv, scored_to_csv_bytes, validate_upload_columns  # noqa: E402
 
 
 configure_page("Upload and Score")

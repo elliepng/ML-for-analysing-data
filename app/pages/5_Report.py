@@ -11,12 +11,12 @@ APP_DIR = Path(__file__).resolve().parents[1]
 if str(APP_DIR) not in sys.path:
     sys.path.insert(0, str(APP_DIR))
 
-from lib.constants import REPORT_ANALYST, RISK_HIGH
-from lib.model_report import has_real_metrics, load_confusion_matrix, load_model_metrics, selected_model_label
-from lib.report_builder import build_audit_report
-from lib.state import get_active_dataset
-from lib.styling import configure_page, inject_global_css, page_intro
-from lib.ui import data_source_banner, human_money, kpi_card, section_header, sidebar_brand, sidebar_cta, surface
+from lib.constants import REPORT_ANALYST, RISK_HIGH  # noqa: E402
+from lib.model_report import has_real_metrics, load_confusion_matrix, load_model_metrics, selected_model_label  # noqa: E402
+from lib.report_builder import build_audit_report  # noqa: E402
+from lib.state import get_active_dataset  # noqa: E402
+from lib.styling import configure_page, inject_global_css, page_intro  # noqa: E402
+from lib.ui import data_source_banner, human_money, kpi_card, section_header, sidebar_brand, sidebar_cta, surface  # noqa: E402
 
 
 configure_page("Generate Audit Report")

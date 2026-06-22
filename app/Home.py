@@ -11,11 +11,11 @@ APP_DIR = Path(__file__).resolve().parent
 if str(APP_DIR) not in sys.path:
     sys.path.insert(0, str(APP_DIR))
 
-from lib.charts import exposure_trend, fraud_type_stacked, recall_gauge, type_mix_donut
-from lib.model_report import has_real_metrics, load_model_metrics
-from lib.state import get_active_dataset
-from lib.styling import configure_page, inject_global_css
-from lib.ui import (
+from lib.charts import exposure_trend, fraud_type_stacked, recall_gauge, type_mix_donut  # noqa: E402
+from lib.model_report import has_real_metrics, load_model_metrics  # noqa: E402
+from lib.state import get_active_dataset  # noqa: E402
+from lib.styling import configure_page, inject_global_css  # noqa: E402
+from lib.ui import (  # noqa: E402
     empty_state,
     human_money,
     model_compare,

@@ -11,16 +11,16 @@ APP_DIR = Path(__file__).resolve().parents[1]
 if str(APP_DIR) not in sys.path:
     sys.path.insert(0, str(APP_DIR))
 
-from lib.charts import confusion_matrix_figure, curve_figure
-from lib.model_report import (
+from lib.charts import confusion_matrix_figure, curve_figure  # noqa: E402
+from lib.model_report import (  # noqa: E402
     has_real_metrics,
     load_confusion_matrix,
     load_model_metrics,
     load_pr_curve,
     load_roc_curve,
 )
-from lib.styling import configure_page, inject_global_css, page_intro
-from lib.ui import section_header, sidebar_brand, sidebar_cta, surface
+from lib.styling import configure_page, inject_global_css, page_intro  # noqa: E402
+from lib.ui import section_header, sidebar_brand, sidebar_cta, surface  # noqa: E402
 
 
 configure_page("Model Analysis")

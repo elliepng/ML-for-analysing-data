@@ -39,8 +39,6 @@ def metric(value: float) -> float:
 
 def tune_threshold(y_true, scores, target_recall: float = 0.95, floor: float = 0.05) -> float:
     """Smallest threshold reaching target recall with the best precision; floor otherwise."""
-    import numpy as np
-
     precision_curve, recall_curve, thresholds = precision_recall_curve(y_true, scores)
     best_threshold = None
     best_precision = -1.0

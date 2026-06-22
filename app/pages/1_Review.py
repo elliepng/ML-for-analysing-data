@@ -9,10 +9,10 @@ APP_DIR = Path(__file__).resolve().parents[1]
 if str(APP_DIR) not in sys.path:
     sys.path.insert(0, str(APP_DIR))
 
-from lib.constants import PAYMENT_TYPES, RISK_MEDIUM
-from lib.state import get_active_dataset
-from lib.styling import configure_page, inject_global_css, page_intro
-from lib.ui import data_source_banner, human_money, kpi_card, risk_badge, section_header, sidebar_brand, sidebar_cta, surface
+from lib.constants import PAYMENT_TYPES, RISK_MEDIUM  # noqa: E402
+from lib.state import get_active_dataset  # noqa: E402
+from lib.styling import configure_page, inject_global_css, page_intro  # noqa: E402
+from lib.ui import data_source_banner, human_money, kpi_card, risk_badge, section_header, sidebar_brand, sidebar_cta, surface  # noqa: E402
 
 
 configure_page("Transaction Review")

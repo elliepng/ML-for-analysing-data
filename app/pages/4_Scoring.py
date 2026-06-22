@@ -9,10 +9,10 @@ APP_DIR = Path(__file__).resolve().parents[1]
 if str(APP_DIR) not in sys.path:
     sys.path.insert(0, str(APP_DIR))
 
-from lib.constants import PAYMENT_TYPES, RISK_HIGH, RISK_MEDIUM
-from lib.scoring import score_single_transaction
-from lib.styling import configure_page, inject_global_css, page_intro
-from lib.ui import kpi_card, risk_badge, section_header, sidebar_brand, sidebar_cta, surface
+from lib.constants import PAYMENT_TYPES, RISK_HIGH, RISK_MEDIUM  # noqa: E402
+from lib.scoring import score_single_transaction  # noqa: E402
+from lib.styling import configure_page, inject_global_css, page_intro  # noqa: E402
+from lib.ui import kpi_card, risk_badge, section_header, sidebar_brand, sidebar_cta, surface  # noqa: E402
 
 
 configure_page("New Transaction Scoring")
