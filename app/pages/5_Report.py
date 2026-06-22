@@ -41,8 +41,8 @@ df = active.scored
 data_source_banner(active.label, is_demo=active.is_demo, is_uploaded=active.is_uploaded)
 filtered = df[df["risk_score"] >= min_risk]
 
-metrics = load_model_metrics(model_key)
-confusion = load_confusion_matrix(model_key)
+metrics = load_model_metrics(model_key=model_key)
+confusion = load_confusion_matrix(model_key=model_key)
 
 if not has_real_metrics():
     st.warning("Hãy train trên PaySim trước khi dùng PDF này như bằng chứng cuối cùng.")
