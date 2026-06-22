@@ -100,12 +100,84 @@ def _table(data: list[list[object]], header: bool = True, row_colors: list[str] 
 
 def _confusion_image(confusion: np.ndarray) -> Image | None:
     try:
-        fig = confusion_matrix_figure(confusion, for_print=True)
-        png = fig.to_image(format="png", scale=2)
-    except Exception:
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+        import io
+
+        fig, ax = plt.subplots(figsize=(4.5, 2.8), dpi=200)
+        im = ax.imshow(confusion, cmap="Blues", interpolation="nearest")
+        
+        # Add values inside cells
+        for i in range(2):
+            for j in range(2):
+                color = "white" if confusion[i, j] > confusion.max() / 2 else "black"
+                ax.text(j, i, f"{confusion[i, j]:,}", ha="center", va="center", color=color, fontweight="bold", fontsize=9)
+                
+        ax.set_xticks([0, 1])
+        ax.set_xticklabels(["Pred normal", "Pred fraud"], fontsize=8)
+        ax.set_yticks([0, 1])
+        ax.set_yticklabels(["Actual normal", "Actual fraud"], fontsize=8)
+        ax.set_title("Confusion matrix", fontsize=10, fontweight="bold", pad=8)
+        
+        fig.tight_layout()
+        
+        buf = io.BytesIO()
+        plt.savefig(buf, format="png", bbox_inches="tight")
+        plt.close(fig)
+        buf.seek(0)
+        
+        return Image(buf, width=4.5 * inch, height=2.8 * inch)
+    except Exception as exc:
+        print(f"Failed to generate confusion matrix image using Matplotlib: {exc}")
         return None
-    image = Image(BytesIO(png), width=4.6 * inch, height=2.8 * inch)
-    return image
+
+
+def _curves_image() -> Image | None:
+    try:
+        from .model_report import load_roc_curve, load_pr_curve
+        roc_points = load_roc_curve()
+        pr_points = load_pr_curve()
+        if not roc_points and not pr_points:
+            return None
+            
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+        import io
+
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(6.5, 2.5), dpi=200)
+        
+        if roc_points:
+            fpr, tpr = roc_points
+            ax1.plot(fpr, tpr, color="#5468f0", lw=2)
+            ax1.plot([0, 1], [0, 1], color="#cbd5e1", linestyle="--")
+            ax1.set_xlabel("False positive rate", fontsize=7)
+            ax1.set_ylabel("True positive rate", fontsize=7)
+            ax1.set_title("ROC Curve", fontsize=9, fontweight="bold")
+            ax1.tick_params(axis="both", which="major", labelsize=7)
+            ax1.grid(True, linestyle=":", alpha=0.6)
+            
+        if pr_points:
+            recall, precision = pr_points
+            ax2.plot(recall, precision, color="#5468f0", lw=2)
+            ax2.set_xlabel("Recall", fontsize=7)
+            ax2.set_ylabel("Precision", fontsize=7)
+            ax2.set_title("Precision-Recall Curve", fontsize=9, fontweight="bold")
+            ax2.tick_params(axis="both", which="major", labelsize=7)
+            ax2.grid(True, linestyle=":", alpha=0.6)
+            
+        fig.tight_layout()
+        
+        buf = io.BytesIO()
+        plt.savefig(buf, format="png", bbox_inches="tight")
+        plt.close(fig)
+        buf.seek(0)
+        
+        return Image(buf, width=6.5 * inch, height=2.5 * inch)
+    except Exception as exc:
+        print(f"Failed to generate curves image using Matplotlib: {exc}")
+        return None
 
 
 def build_audit_report(
@@ -216,6 +288,11 @@ def build_audit_report(
         )
         row_colors.append("#fee2e2" if row.get("risk_level") == "High" else "#ffffff")
     elements.append(_table(top_data, row_colors=row_colors))
+    elements.append(Spacer(1, 0.15 * inch))
+
+    curves_img = _curves_image()
+    if curves_img is not None:
+        elements.append(curves_img)
 
     elements.append(Paragraph("Method notes", styles["SectionTitle"]))
     elements.append(
